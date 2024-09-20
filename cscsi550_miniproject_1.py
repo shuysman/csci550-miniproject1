@@ -336,6 +336,24 @@ def extract_names_spacy(caption):
 
   return names
 
+def extract_other_spacy(caption):
+  """
+  Extracts names from a caption using spaCy.
+
+  Args:
+    caption: The caption text.
+
+  Returns:
+    A list of names extracted from the caption.
+  """
+
+  caption = split_married_couple(caption)
+  caption = remove_blacklisted_words(caption)
+  doc = nlp(split_married_couple(caption))
+  other = [ent for ent in doc.ents if ent.label_ != "PERSON"]
+
+  return other
+
 
 ### Raw caption text
 ##[caption.text for caption in captions]
@@ -381,6 +399,11 @@ print(len(all_captions))
 
 cleaned_captions = list(map(lambda caption: extract_names_spacy(caption.text), all_captions))
 
+### Entities identified by spaCy that are not PERSON, for debugging purposes
+other_labeled_words = [(ent, ent.label_) for ents in
+                       map(lambda caption: extract_other_spacy(caption.text), all_captions)
+                       for ent in ents]
+
 len(cleaned_captions)
 #71316
 
@@ -392,6 +415,12 @@ len(unique_names)
 with open("names.txt", "w") as f:
     f.writelines([f"{str(name)}\n" for name in sorted(list(unique_names))])
 
+
+with open("other.csv", "w") as f:
+    f.write("Label, Text\n")
+    f.writelines([f"{ent[1]},{ent[0]}\n" for ent in other_labeled_words])
+
+    
 list(unique_names)[:100]
 
 ##[name for name in list(unique_names) if len(name.split()) == 1]
@@ -455,14 +484,19 @@ print(degrees[-10:])
 #### may be impossible to do in a meaningful way.
 
 jean_shafiroff_subgraph = G.subgraph(nx.ego_graph(G, "Jean Shafiroff"))
+deg = jean_shafiroff_subgraph.degree()
+nlarge = G.subgraph([n for n in deg if deg[n[0]] >= 10])
+nsmall = G.subgraph([n for n in deg if deg[n[0]] < 10])
 
-elarge = [(u, v) for (u, v, d) in jean_shafiroff_subgraph.edges(data=True) if d["weight"] > 10]
-esmall = [(u, v) for (u, v, d) in jean_shafiroff_subgraph.edges(data=True) if d["weight"] <= 10]
+elarge = [(u, v) for (u, v, d) in jean_shafiroff_subgraph.edges(data=True) if d["weight"] > 1]
+esmall = [(u, v) for (u, v, d) in jean_shafiroff_subgraph.edges(data=True) if d["weight"] == 1]
 
 pos = nx.spring_layout(jean_shafiroff_subgraph, seed=7)  # positions for all nodes - seed for reproducibility
 
+
 # nodes
-nx.draw_networkx_nodes(jean_shafiroff_subgraph, pos, node_size=100)
+nx.draw_networkx_nodes(nlarge, pos, node_size=100)
+nx.draw_networkx_nodes(nsmall, pos, node_size=25)
 
 # edges
 nx.draw_networkx_edges(jean_shafiroff_subgraph, pos, edgelist=elarge, width=2)
@@ -471,7 +505,7 @@ nx.draw_networkx_edges(
 )
 
 # node labels
-nx.draw_networkx_labels(jean_shafiroff_subgraph, pos, font_size=8, font_family="sans-serif")
+nx.draw_networkx_labels(nlarge, pos, font_size=8, font_family="sans-serif")
 # edge weight labels
 ##edge_labels = nx.get_edge_attributes(jean_shafiroff_subgraph, "weight")
 ##nx.draw_networkx_edge_labels(jean_shafiroff_subgraph, pos, edge_labels)
