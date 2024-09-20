@@ -303,7 +303,7 @@ def clean_name(name):
     name = name.strip()
     name = re.sub("'s$", "", name)    ### remove trailing 's
     name = re.sub(r"\s+", " ", name)  ### replace sequences of multiple whitespaces with a single space char
-    name = name.strip("\\")
+    name = name.strip("/")
     
     return name
 
