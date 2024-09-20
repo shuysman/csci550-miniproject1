@@ -282,18 +282,19 @@ nlp = spacy.load("en_core_web_lg")
 
 
 test = "John and Jane Smith"
-def split_groups(text):
-    couple_re = r"([A-Z][a-z]+)\s+and\s+([A-Z][a-z]+)\s+([A-Z][a-z]+)"
-
-    match = re.match(couple_re, text)
+def split_married_couple(text):
+  groups = re.split(r',\s*(and|with)\s*', text)
+  names = []
+  for group in groups:
+    match = re.search(r'(.*) and (.*) (\w+)', group)
     if match:
-        last_name = match.group(3)
-
-        first_person = f"{match.group(1)} {last_name}"
-        second_person = re.split("and", text)[1]
-        return([first_person, second_person])
+      first_name1 = match.group(1)
+      first_name2 = match.group(2)
+      last_name = match.group(3)
+      names.extend([f"{first_name1} {last_name}", f"{first_name2} {last_name}"])
     else:
-        return([text])
+      names.append(group)
+  return ", ".join(names)
   
 def extract_names_spacy(caption):
   """
@@ -306,19 +307,8 @@ def extract_names_spacy(caption):
     A list of names extracted from the caption.
   """
 
-
-  ### Split up caption into strings separated by commas.  Then loop
-  ### through each string and check if it is a "couple" (names
-  ### separated by and).  If so, repair the last names for the first
-  ### person in the couple.  Then reconstruct the caption with
-  ### repaired names
-  captions = []
-  caption_split = re.split(",", caption)
-  for obj in caption_split:
-      captions.extend(split_groups(obj))
-  caption_joined = ",".join(captions)
-  
-  doc = nlp(caption_joined)
+ 
+  doc = nlp(split_married_couple(caption))
   names = [ent for ent in doc.ents if ent.label_ == "PERSON"]
 
   return names
@@ -327,7 +317,7 @@ def extract_names_spacy(caption):
 ##[caption.text for caption in captions]
 
 ### Names parsed from caption text
-list(map(lambda caption: extract_names_spacy(caption.text), captions))
+##list(map(lambda caption: extract_names_spacy(caption.text), captions))
 
 
 """Once you feel that your algorithm is working well on these captions, parse all of the captions and extract all the names mentioned.
