@@ -40,6 +40,9 @@ import matplotlib.pyplot as plt
 
 import re
 
+import itertools  # itertools.combinations may be useful
+import networkx as nx
+
 #!pip install spacy
 #!python -m spacy download en_core_web_lg
 
@@ -379,9 +382,6 @@ For the remaining analysis, we think of the problem in terms of a
 [network](http://en.wikipedia.org/wiki/Computer_network) or a
 [graph](https://en.wikipedia.org/wiki/Graph_%28discrete_mathematics%29).  Any time a pair of people appear in a photo together, that is considered a link.  It is an example of  an **undirected weighted graph**. We recommend using python's [`networkx`](https://networkx.github.io/) library.
 """
-
-import itertools  # itertools.combinations may be useful
-import networkx as nx
 
 """All in all, you should end up with over 100,000 captions and more than 110,000 names, connected in about 200,000 pairs.
 
