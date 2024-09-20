@@ -298,15 +298,25 @@ def split_married_couple(text):
   return ", ".join(names)
 
 
+def remove_blacklisted_words(text):
+    ### Pre-processing cleaning.  Remove blacklisted words that pass through spaCy filter
+    text = re.sub("Frick Director", "", text)
+    text = re.sub("Chair(wo)?m(e|a)n", "", text)
+    text = re.sub("CFO", "", text)
+    text = re.sub("Honoree", "", text)
+
+    return text
+
 def clean_name(name):
+    ### Post-processing cleaning, after names are recognized by spaCy
     name = str(name)
-    name = name.strip()
     name = re.sub("'s$", "", name)    ### remove trailing 's
     name = re.sub(r"\s+", " ", name)  ### replace sequences of multiple whitespaces with a single space char
     name = name.strip("/")
+    name = name.strip("'")
+    name = name.strip()
     
     return name
-
 
 def extract_names_spacy(caption):
   """
@@ -319,7 +329,8 @@ def extract_names_spacy(caption):
     A list of names extracted from the caption.
   """
 
- 
+  caption = split_married_couple(caption)
+  caption = remove_blacklisted_words(caption)
   doc = nlp(split_married_couple(caption))
   names = [clean_name(ent) for ent in doc.ents if ent.label_ == "PERSON"]
 
