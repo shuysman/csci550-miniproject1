@@ -333,13 +333,43 @@ Now, run this sort of test on a few other pages.  You will probably find that ot
 Once you are satisfied that your caption scraper and parser are working, run this for all of the pages.  If you haven't implemented some caching of the captions, you probably want to do this first.
 """
 
-all_captions = []
-for link in link_list:
-  captions = get_captions(link[0])
-  all_captions.extend(captions)
-  time.sleep(10)
+# all_captions = []
+# for link in link_list:
+#   captions = get_captions(link[0])
+#   all_captions.extend(captions)
+#   time.sleep(10)
 
-print(all_captions)
+# print(all_captions)
+
+def get_captions_file(webpage):
+  soup = BeautifulSoup(webpage, "lxml")
+  return soup.select("div.photocaption")
+
+all_captions = []
+for file in glob.glob("./nysd/*"):
+    with open(file, "r", encoding='utf-8', errors='ignore') as f:
+        webpage = f.read()
+        captions = get_captions_file(webpage)
+        all_captions.extend(captions)
+
+
+# import sys
+# sys.setrecursionlimit(100000)
+# dill.dump(all_captions, open('all_captions.pkd', 'wb'))
+
+# all_captions = dill.load(open('all_captions.pkd', 'rb'))
+
+print(len(all_captions))
+
+cleaned_captions = list(map(lambda caption: extract_names_spacy(caption.text), all_captions))
+
+len(cleaned_captions)
+#71316
+
+unique_names = set([name for names in cleaned_captions for name in names])
+
+len(unique_names)
+#151736
 
 # Scraping all of the pages could take 10 minutes to an hour
 
