@@ -434,19 +434,21 @@ The simplest question to ask is "who is the most popular"?  The easiest way to a
     "max": 666.0
 """
 
-G = nx.MultiGraph()
-pairs = []
+G = nx.Graph()
 for caption in cleaned_captions:
-    a = itertools.combinations(caption, 2)
-    pairs.extend(a)
-len(pairs)
+    pairs = itertools.combinations(caption, 2)
+    for pair in pairs:
+        first_person = pair[0]
+        second_person = pair[1]
+        if G.has_edge(first_person, second_person):
+            G[first_person][second_person]['weight'] += 1
+        else:
+            G.add_edge(first_person, second_person, weight = 1)
 
-G.add_edges_from(pairs)
+degrees = sorted(G.degree(weight = "weight"), key = lambda x: (-x[1]))
 
-degrees = sorted(G.degree, key = lambda x: (-x[1]))
-
-print(degrees[:100])
-print(degrees[-100:])
+print(degrees[:10])
+print(degrees[-10:])
 
 """## Question 5: Centrality analysis (20 p)
 
