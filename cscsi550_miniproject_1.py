@@ -295,7 +295,16 @@ def split_married_couple(text):
     else:
       names.append(group)
   return ", ".join(names)
-  
+
+
+def clean_name(name):
+    name = str(name)
+    name = name.strip()
+    name = re.sub("'s$", "", name)
+    
+    return name
+
+
 def extract_names_spacy(caption):
   """
   Extracts names from a caption using spaCy.
@@ -309,9 +318,10 @@ def extract_names_spacy(caption):
 
  
   doc = nlp(split_married_couple(caption))
-  names = [ent for ent in doc.ents if ent.label_ == "PERSON"]
+  names = [clean_name(ent) for ent in doc.ents if ent.label_ == "PERSON"]
 
   return names
+
 
 ### Raw caption text
 ##[caption.text for caption in captions]
@@ -365,6 +375,13 @@ unique_names = set([name for names in cleaned_captions for name in names])
 len(unique_names)
 #151736
 
+with open("names.txt", "w") as f:
+    f.writelines([f"{str(name)}\n" for name in list(unique_names)])
+
+list(unique_names)[:100]
+
+##[name for name in list(unique_names) if len(name.split()) == 1]
+
 # Scraping all of the pages could take 10 minutes to an hour
 
 """## Phase 3: Graph Analysis
@@ -415,6 +432,7 @@ G.add_edges_from(pairs)
 degrees = sorted(G.degree, key = lambda x: (-x[1]))
 
 print(degrees[:100])
+print(degrees[-100:])
 
 """## Question 5: Centrality analysis (20 p)
 
