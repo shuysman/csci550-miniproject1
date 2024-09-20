@@ -412,7 +412,18 @@ The simplest question to ask is "who is the most popular"?  The easiest way to a
     "max": 666.0
 """
 
-degree =
+G = nx.MultiGraph()
+list = []
+for caption in cleaned_captions:
+    a = itertools.combinations(caption, 2)
+    list.extend(a)
+len(list)
+
+G.add_edges_from(list)
+
+degrees = sorted(G.degree, key = lambda x: (-x[1]))
+
+print(degrees[:100])
 
 """## Question 5: Centrality analysis (20 p)
 
