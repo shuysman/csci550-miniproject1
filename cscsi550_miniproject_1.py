@@ -450,6 +450,39 @@ degrees = sorted(G.degree(weight = "weight"), key = lambda x: (-x[1]))
 print(degrees[:10])
 print(degrees[-10:])
 
+#### Draw subgraph for Jean Shafiroff (Highest Degree) to visualize an
+#### example node with high importance.  Visualizing the entire graph
+#### may be impossible to do in a meaningful way.
+
+jean_shafiroff_subgraph = G.subgraph(nx.ego_graph(G, "Jean Shafiroff"))
+
+elarge = [(u, v) for (u, v, d) in jean_shafiroff_subgraph.edges(data=True) if d["weight"] > 10]
+esmall = [(u, v) for (u, v, d) in jean_shafiroff_subgraph.edges(data=True) if d["weight"] <= 10]
+
+pos = nx.spring_layout(jean_shafiroff_subgraph, seed=7)  # positions for all nodes - seed for reproducibility
+
+# nodes
+nx.draw_networkx_nodes(jean_shafiroff_subgraph, pos, node_size=100)
+
+# edges
+nx.draw_networkx_edges(jean_shafiroff_subgraph, pos, edgelist=elarge, width=2)
+nx.draw_networkx_edges(
+    jean_shafiroff_subgraph, pos, edgelist=esmall, width=2, alpha=0.5, edge_color="b", style="dashed"
+)
+
+# node labels
+nx.draw_networkx_labels(jean_shafiroff_subgraph, pos, font_size=8, font_family="sans-serif")
+# edge weight labels
+##edge_labels = nx.get_edge_attributes(jean_shafiroff_subgraph, "weight")
+##nx.draw_networkx_edge_labels(jean_shafiroff_subgraph, pos, edge_labels)
+
+ax = plt.gca()
+ax.margins(0.08)
+plt.axis("off")
+plt.tight_layout()
+plt.show()
+
+
 """## Question 5: Centrality analysis (20 p)
 
 Use eccentricity centrality, closeness centrality, betweenness centrality, prestige, and PageRank to identify the top 10 individuals with the highest centrality for each measure. How do you interpret the results?
