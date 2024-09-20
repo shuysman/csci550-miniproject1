@@ -289,7 +289,7 @@ def split_groups(text):
         second_person = re.split("and", text)[1]
         return([first_person, second_person])
     else:
-        return(text)
+        return([text])
   
 def extract_names_spacy(caption):
   """
@@ -301,14 +301,20 @@ def extract_names_spacy(caption):
   Returns:
     A list of names extracted from the caption.
   """
+
+  captions = []
+  caption_split = re.split(",", caption)
+  for obj in caption_split:
+      captions.extend(split_groups(obj))
+  caption_joined = ",".join(captions)
   
-  doc = nlp(caption)
+  doc = nlp(caption_joined)
   names = [ent for ent in doc.ents if ent.label_ == "PERSON"]
 
   return names
 
 ### Raw caption text
-[caption.text for caption in captions]
+##[caption.text for caption in captions]
 
 ### Names parsed from caption text
 list(map(lambda caption: extract_names_spacy(caption.text), captions))
