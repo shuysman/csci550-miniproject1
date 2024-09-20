@@ -413,13 +413,13 @@ The simplest question to ask is "who is the most popular"?  The easiest way to a
 """
 
 G = nx.MultiGraph()
-list = []
+pairs = []
 for caption in cleaned_captions:
     a = itertools.combinations(caption, 2)
-    list.extend(a)
-len(list)
+    pairs.extend(a)
+len(pairs)
 
-G.add_edges_from(list)
+G.add_edges_from(pairs)
 
 degrees = sorted(G.degree, key = lambda x: (-x[1]))
 
