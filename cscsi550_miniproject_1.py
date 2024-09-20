@@ -282,12 +282,13 @@ nlp = spacy.load("en_core_web_lg")
 
 
 test = "John and Jane Smith"
+test2 = "Jean Shafiroff and Mary Mahoney"
 def split_married_couple(text):
   groups = re.split(r',\s*(and|with)\s*', text)
   names = []
   for group in groups:
     match = re.search(r'(.*) and (.*) (\w+)', group)
-    if match:
+    if match and len(match.group(1).split()) == 1:  ### Only repair names if first name in pair is just first name
       first_name1 = match.group(1)
       first_name2 = match.group(2)
       last_name = match.group(3)
@@ -300,7 +301,9 @@ def split_married_couple(text):
 def clean_name(name):
     name = str(name)
     name = name.strip()
-    name = re.sub("'s$", "", name)
+    name = re.sub("'s$", "", name)    ### remove trailing 's
+    name = re.sub(r"\s+", " ", name)  ### replace sequences of multiple whitespaces with a single space char
+    name = name.strip("\\")
     
     return name
 
