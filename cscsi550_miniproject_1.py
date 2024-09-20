@@ -379,7 +379,7 @@ len(unique_names)
 #151736
 
 with open("names.txt", "w") as f:
-    f.writelines([f"{str(name)}\n" for name in list(unique_names)])
+    f.writelines([f"{str(name)}\n" for name in sorted(list(unique_names))])
 
 list(unique_names)[:100]
 
