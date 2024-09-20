@@ -302,6 +302,12 @@ def extract_names_spacy(caption):
     A list of names extracted from the caption.
   """
 
+
+  ### Split up caption into strings separated by commas.  Then loop
+  ### through each string and check if it is a "couple" (names
+  ### separated by and).  If so, repair the last names for the first
+  ### person in the couple.  Then reconstruct the caption with
+  ### repaired names
   captions = []
   caption_split = re.split(",", caption)
   for obj in caption_split:
